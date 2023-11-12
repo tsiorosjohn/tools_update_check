@@ -18,10 +18,10 @@
     "note": ""
   },
   "pcmd_parser": {
-    "latest_version": "v0.0.3_beta",
-    "last_update_date": "09.11.2023",
+    "latest_version": "v0.0.4_beta",
+    "last_update_date": "13.11.2023",
     "repo_url": "https://gitlabe2.ext.net.nokia.com/CMMtools/pcmd_parser",
-    "note": ""
+    "note": "added: Support for automatic check for online updates"
   },
   "cmmlogcollect": {
     "latest_version": "1.7.2",

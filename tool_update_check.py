@@ -70,19 +70,19 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
             latest_version = online_data_project.get("latest_version", "")
             last_update_date = online_data_project.get("last_update_date", "")
             repo_url = online_data_project.get("repo_url", "")
-            note = online_data_project.get("note", "")
-            return latest_version, last_update_date, repo_url, note
+            note_f = online_data_project.get("note", "")
+            return latest_version, last_update_date, repo_url, note_f
         except (error.URLError, json.JSONDecodeError) as ex:
             if UPDATE_CHECK_DEBUG:
                 print(f"Error checking online version: {ex}")
             return None, None, None, None
 
-    def upd_chk_save_last_check_info(last_check_timestamp, latest_version, last_update_date, repo_url, project_name_f, note):
+    def upd_chk_save_last_check_info(last_check_timestamp, latest_version, last_update_date, repo_url, project_name_f, note_f):
         """
         Saves retrieved info in local json file
         """
         data_d = {"last_check_timestamp": last_check_timestamp, "latest_version_local": latest_version, "last_update_date": last_update_date,
-                  "repo_url": repo_url, "project_name": project_name_f, "note": note}
+                  "repo_url": repo_url, "project_name": project_name_f, "note": note_f}
         with open(UPDATE_CHECK_LAST_CHECK_FILE, 'w') as file:
             json.dump(data_d, file, indent=2)
 
@@ -134,7 +134,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
 
             # check online if delay_check_in_seconds has been elapsed - else, try to compare from locally stored (previously retrieved) 'local_latest_version'
             if current_timestamp - last_check_timestamp >= delay_check_in_seconds:
-                latest_version, last_update_date, repo_url, note = upd_chk_check_online_version(project_name_f)
+                latest_version, last_update_date, repo_url, note_f = upd_chk_check_online_version(project_name_f)
 
                 if latest_version is not None:
                     try:
@@ -145,7 +145,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                                 print(f"last_update_date: {last_update_date}")
                                 print(f"Repository URL: {repo_url}")
                                 print(f"Project Name: {project_name_f}")
-                                print(f"Note: {note}")
+                                print(f"Note: {note_f}")
                                 print(f"{'-' * 100}")
                             # Implement update mechanism here
 
@@ -153,7 +153,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                             if UPDATE_CHECK_DEBUG:
                                 print("You have the latest version. Proceeding with execution.")
                         # Save the new version and timestamp to the local JSON file
-                        upd_chk_save_last_check_info(current_timestamp, latest_version, last_update_date, repo_url, project_name_f, note)
+                        upd_chk_save_last_check_info(current_timestamp, latest_version, last_update_date, repo_url, project_name_f, note_f)
                     except TypeError as ex:
                         if UPDATE_CHECK_DEBUG:
                             print(f"An exception occurred: {ex}")

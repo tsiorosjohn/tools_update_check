@@ -2,31 +2,37 @@
   "tdt": {
     "latest_version": "4.4.1",
     "last_update_date": "08.11.2023",
-    "repo_url": "https://gitlabe2.ext.net.nokia.com/tsioros/TDT_simple"
+    "repo_url": "https://gitlabe2.ext.net.nokia.com/tsioros/TDT_simple",
+    "note": ""
   },
   "capscli_decrypt": {
     "latest_version": "1.9.0",
     "last_update_date": "12.11.2023",
-    "repo_url": "https://gitlabe2.ext.net.nokia.com/tsioros/capscli_decrypt"
+    "repo_url": "https://gitlabe2.ext.net.nokia.com/tsioros/capscli_decrypt",
+    "note": ""
   },
   "perf_parser": {
     "latest_version": "1.13.0",
     "last_update_date": "12.11.2023",
-    "repo_url": "https://gitlabe2.ext.net.nokia.com/CMMtools/perf_parsing_scripts"
+    "repo_url": "https://gitlabe2.ext.net.nokia.com/CMMtools/perf_parsing_scripts",
+    "note": ""
   },
   "pcmd_parser": {
     "latest_version": "v0.0.3_beta",
     "last_update_date": "09.11.2023",
-    "repo_url": "https://gitlabe2.ext.net.nokia.com/CMMtools/pcmd_parser"
+    "repo_url": "https://gitlabe2.ext.net.nokia.com/CMMtools/pcmd_parser",
+    "note": ""
   },
   "cmmlogcollect": {
     "latest_version": "1.7.2",
     "last_update_date": "20.12.2022",
-    "repo_url": "https://gitlabe2.ext.net.nokia.com/CMMtools/cmmlogcollect"
+    "repo_url": "https://gitlabe2.ext.net.nokia.com/CMMtools/cmmlogcollect",
+    "note": ""
   },
   "test": {
     "latest_version": "1.7.2",
     "last_update_date": "20.12.2022",
-    "repo_url": "https://test.com"
+    "repo_url": "https://test.com",
+    "note": "extra note/comment that might be need to be communicated as well"
   }
 }

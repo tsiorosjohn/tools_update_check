@@ -5,7 +5,7 @@ import threading
 import re
 from urllib import request, error
 
-UPDATE_CHECK_LAST_CHECK_FILE = "last_check.json"
+UPDATE_CHECK_LAST_CHECK_FILE = "update_last_check.json"
 UPDATE_CHECK_URL = "https://raw.githubusercontent.com/tsiorosjohn/tools_update_check/master/latest_versions.json"
 UPDATE_CHECK_DEBUG = True
 

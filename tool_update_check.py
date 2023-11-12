@@ -34,8 +34,6 @@ def upd_chk_check_online_version(project_name):
         latest_version = online_data_project.get("latest_version", "")
         last_update_date_f = online_data_project.get("last_update_date", "")
         repo_url_f = online_data_project.get("repo_url", "")
-        if UPDATE_CHECK_DEBUG:
-            print(f"...checking online... \n Found...{latest_version = } // {repo_url_f = } // {project_name = }")
         return latest_version, last_update_date_f, repo_url_f
     except (error.URLError, json.JSONDecodeError) as e:
         if UPDATE_CHECK_DEBUG:
@@ -44,7 +42,8 @@ def upd_chk_check_online_version(project_name):
 
 
 def upd_chk_save_last_check_info(last_check_timestamp, latest_version, last_update_date_f, repo_url_f, project_name):
-    data = {"last_check_timestamp": last_check_timestamp, "latest_version_local": latest_version, "last_update_date": last_update_date_f, "repo_url": repo_url_f,
+    data = {"last_check_timestamp": last_check_timestamp, "latest_version_local": latest_version, "last_update_date": last_update_date_f,
+            "repo_url": repo_url_f,
             "project_name": project_name}
     with open(UPDATE_CHECK_LAST_CHECK_FILE, 'w') as file:
         json.dump(data, file, indent=4)
@@ -73,7 +72,7 @@ def upd_chk_load_last_check_info(create_if_missing=False):
     return data
 
 
-def upd_chk_update_check_thread(project_name, local_tool_version_f):
+def upd_chk_update_check_thread(project_name, local_tool_version_f, online_check_frequency):
     """
     Start a thread and check online if latest_version exists.
     If yes, store this in local json. Tool will get the info from local_json in next tool run and compare this with tool version
@@ -83,8 +82,11 @@ def upd_chk_update_check_thread(project_name, local_tool_version_f):
         # last_check_timestamp, local_latest_version = data.get("last_check_timestamp", 0), data.get("latest_version_local")
         last_check_timestamp, local_latest_version = data.get("last_check_timestamp", 0), data.get("latest_version_local")
         current_timestamp = time.time()
-        # delay_check_in_seconds = 7 * 24 * 60 * 60  # Approximate seconds in a week
-        delay_check_in_seconds = 15  # Approximate seconds in a week  # todo: comment / use a week delay
+        if online_check_frequency == 'always':
+            delay_check_in_seconds = 1
+        else:
+            # delay_check_in_seconds = int(online_check_frequency) * 24 * 60 * 60  # Approximate seconds for those number of days
+            delay_check_in_seconds = 15  # for test purposes  # todo: comment this
 
         # check online if delay_check_in_seconds has been elapsed - else, try to compare from locally stored (previously retrieved) 'local_latest_version'
         if current_timestamp - last_check_timestamp >= delay_check_in_seconds:
@@ -120,15 +122,28 @@ def upd_chk_update_check_thread(project_name, local_tool_version_f):
 
         else:
             if UPDATE_CHECK_DEBUG:
-                print(f"Check already performed within the last week. \n"
-                      f"Latest version from local info: {local_latest_version}")
+                print(f"Online check already performed within the last {online_check_frequency} days. No need to re-check online!!!\n"
+                      f"Latest version retrieved from local JSON temp file: '{local_latest_version}'")
 
 
-def upd_chk_main_tool_update_check(project_name, local_tool_version_f):
+def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_check_frequency=7):
+    """
+
+    Args:
+        project_name: online JSON is a dict of all projects. Choose which is the one of interest
+        local_tool_version_f: actual local tool version; could be outdated
+        online_check_frequency: how often online JSON of latest versions have to be checked ('always', or <int>: days)
+
+    Returns:
+        update_needed: bool
+        temp_json_latest_version: latest version of tool (as depicted in temp JSON file; if online has not been performed might not be the actual updated one)
+        last_update_date: last date that updated version was released
+        repo_url: download URL of latest tool
+    """
     try:
         update_needed_f = False
         # Create a separate thread for the update check
-        update_thread = threading.Thread(target=upd_chk_update_check_thread, args=(project_name, local_tool_version_f))
+        update_thread = threading.Thread(target=upd_chk_update_check_thread, args=(project_name, local_tool_version_f, online_check_frequency))
 
         # Start the update check thread in the background
         update_thread.start()
@@ -169,7 +184,7 @@ if __name__ == "__main__":
     time.sleep(1)
 
     # example call of function:
-    update_needed, temp_json_latest_version, last_update_date, repo_url = upd_chk_main_tool_update_check('tdt', local_tool_version)
+    update_needed, temp_json_latest_version, last_update_date, repo_url = upd_chk_main_tool_update_check('tdt', local_tool_version, 1)
 
     if update_needed:
         print(f"New version '{temp_json_latest_version} - {last_update_date}' of tool is available to be downloaded from '{repo_url}'.")

@@ -7,7 +7,7 @@ from urllib import request, error
 
 UPDATE_CHECK_LAST_CHECK_FILE = "update_last_check.json"
 UPDATE_CHECK_URL = "https://raw.githubusercontent.com/tsiorosjohn/tools_update_check/master/latest_versions.json"
-UPDATE_CHECK_DEBUG = True
+UPDATE_CHECK_DEBUG = True  # todo: change to False for production
 
 # Lock for thread-safe access to shared resources
 update_check_lock = threading.Lock()
@@ -126,13 +126,14 @@ def upd_chk_update_check_thread(project_name, local_tool_version_f, online_check
                       f"Latest version retrieved from local JSON temp file: '{local_latest_version}'")
 
 
-def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_check_frequency=7):
+def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_check_frequency=7, print_update_warning=True):
     """
 
     Args:
         project_name: online JSON is a dict of all projects. Choose which is the one of interest
         local_tool_version_f: actual local tool version; could be outdated
         online_check_frequency: how often online JSON of latest versions have to be checked ('always', or <int>: days)
+        print_update_warning: False if no print warning is necessary (e.g. need to handle proprietary the warning, or 'use-case' of calling with '-v' args.cli)
 
     Returns:
         update_needed: bool
@@ -167,6 +168,9 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
 
         if UPDATE_CHECK_DEBUG:
             print(f"\n{'=' * 100} \n{update_needed_f = } \n{temp_json_latest_version_f = } \n{last_update_date_f = } \n{repo_url_f = }\n{'=' * 100} ")
+
+        if update_needed_f and print_update_warning:
+            print(f"New version '{temp_json_latest_version_f} - {last_update_date_f}' of tool is available to be downloaded from '{repo_url_f}'.")
         return update_needed_f, temp_json_latest_version_f, last_update_date_f, repo_url_f
     except Exception as e:
         if UPDATE_CHECK_DEBUG:
@@ -184,11 +188,9 @@ if __name__ == "__main__":
     time.sleep(1)
 
     # example call of function:
-    update_needed, temp_json_latest_version, last_update_date, repo_url = upd_chk_main_tool_update_check('tdt', local_tool_version, 1)
+    # update_needed, temp_json_latest_version, last_update_date, repo_url = upd_chk_main_tool_update_check('tdt', local_tool_version, 1)
 
-    if update_needed:
-        print(f"New version '{temp_json_latest_version} - {last_update_date}' of tool is available to be downloaded from '{repo_url}'.")
-
+    upd_chk_main_tool_update_check('tdt', local_tool_version, 1)  # todo: change to correct project
     time.sleep(2)
 
     print('Done...')

@@ -32,19 +32,19 @@ def upd_chk_check_online_version(project_name):
         online_data = json.loads(response.read().decode('utf-8'))
         online_data_project = online_data[project_name]
         latest_version = online_data_project.get("latest_version", "")
-        last_update_date = online_data_project.get("last_update_date", "")
-        repo_url = online_data_project.get("repo_url", "")
+        last_update_date_f = online_data_project.get("last_update_date", "")
+        repo_url_f = online_data_project.get("repo_url", "")
         if UPDATE_CHECK_DEBUG:
-            print(f"...checking online... \n Found...{latest_version = } // {repo_url = } // {project_name = }")
-        return latest_version, last_update_date, repo_url
+            print(f"...checking online... \n Found...{latest_version = } // {repo_url_f = } // {project_name = }")
+        return latest_version, last_update_date_f, repo_url_f
     except (error.URLError, json.JSONDecodeError) as e:
         if UPDATE_CHECK_DEBUG:
             print(f"Error checking online version: {e}")
         return None, None, None
 
 
-def upd_chk_save_last_check_info(last_check_timestamp, latest_version, last_update_date, repo_url, project_name):
-    data = {"last_check_timestamp": last_check_timestamp, "latest_version_local": latest_version, "last_update_date": last_update_date, "repo_url": repo_url,
+def upd_chk_save_last_check_info(last_check_timestamp, latest_version, last_update_date_f, repo_url_f, project_name):
+    data = {"last_check_timestamp": last_check_timestamp, "latest_version_local": latest_version, "last_update_date": last_update_date_f, "repo_url": repo_url_f,
             "project_name": project_name}
     with open(UPDATE_CHECK_LAST_CHECK_FILE, 'w') as file:
         json.dump(data, file, indent=4)
@@ -88,7 +88,7 @@ def upd_chk_update_check_thread(project_name, local_tool_version_f):
 
         # check online if delay_check_in_seconds has been elapsed - else, try to compare from locally stored (previously retrieved) 'local_latest_version'
         if current_timestamp - last_check_timestamp >= delay_check_in_seconds:
-            latest_version, last_update_date, repo_url = upd_chk_check_online_version(project_name)
+            latest_version, last_update_date_f, repo_url_f = upd_chk_check_online_version(project_name)
 
             if latest_version is not None:
                 try:
@@ -96,8 +96,8 @@ def upd_chk_update_check_thread(project_name, local_tool_version_f):
                         if UPDATE_CHECK_DEBUG:
                             print(f"{'-' * 40} Checking online!!! {'-' * 40}")
                             print(f"New version available: {latest_version}")
-                            print(f"last_update_date: {last_update_date}")
-                            print(f"Repository URL: {repo_url}")
+                            print(f"last_update_date: {last_update_date_f}")
+                            print(f"Repository URL: {repo_url_f}")
                             print(f"Project Name: {project_name}")
                             print(f"{'-' * 100}")
                         # Implement update mechanism here
@@ -106,7 +106,7 @@ def upd_chk_update_check_thread(project_name, local_tool_version_f):
                         if UPDATE_CHECK_DEBUG:
                             print("You have the latest version. Proceeding with execution.")
                     # Save the new version and timestamp to the local JSON file
-                    upd_chk_save_last_check_info(current_timestamp, latest_version, last_update_date, repo_url, project_name)
+                    upd_chk_save_last_check_info(current_timestamp, latest_version, last_update_date_f, repo_url_f, project_name)
                 except TypeError as e:
                     if UPDATE_CHECK_DEBUG:
                         print(f"An exception occurred: {e}")
@@ -135,7 +135,6 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f):
 
         # check from local json if update is needed and display appropriate warning
         data = upd_chk_load_last_check_info()
-        last_check_timestamp = data['last_check_timestamp']
         last_update_date_f = data['last_update_date']
         temp_json_latest_version_f = data['latest_version_local']
         repo_url_f = data['repo_url']

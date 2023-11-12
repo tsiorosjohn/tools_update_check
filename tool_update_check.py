@@ -5,12 +5,12 @@ import threading
 import re
 from urllib import request, error
 
-LAST_CHECK_FILE = "last_check.json"
-UPDATE_URL = "https://raw.githubusercontent.com/tsiorosjohn/tools_update_check/master/latest_versions.json"
-UPDATE_CHECK_DEBUG = False
+UPDATE_CHECK_LAST_CHECK_FILE = "last_check.json"
+UPDATE_CHECK_URL = "https://raw.githubusercontent.com/tsiorosjohn/tools_update_check/master/latest_versions.json"
+UPDATE_CHECK_DEBUG = True
 
 # Lock for thread-safe access to shared resources
-lock = threading.Lock()
+update_check_lock = threading.Lock()
 
 
 def version_str_to_tuple(version_str):
@@ -28,7 +28,7 @@ def version_str_to_tuple(version_str):
 
 def check_online_version(project_name):
     try:
-        response = request.urlopen(UPDATE_URL)
+        response = request.urlopen(UPDATE_CHECK_URL)
         online_data = json.loads(response.read().decode('utf-8'))
         online_data_project = online_data[project_name]
         latest_version = online_data_project.get("latest_version", "")
@@ -43,52 +43,17 @@ def check_online_version(project_name):
         return None, None, None
 
 
-def check_online_version_test():
-    """
-    For testing purposes without need of GitHub
-    """
-    json_data = '''
-    {
-      "tdt": {
-        "latest_version": "4.4.1",
-        "last_update_date": "08.11.2023",
-        "repo_url": "https://gitlabe2.ext.net.nokia.com/tsioros/TDT_simple"
-      },
-      "test_project": {
-        "latest_version": "1.0.0",
-        "last_update_date": "10.11.2023",
-        "repo_url": "https://example.com/another_project"
-      }
-    }
-    '''
-
-    python_dict = json.loads(json_data)
-    key = 'tdt'
-    try:
-        latest_version = python_dict[key].get("latest_version", "")
-        last_update_date = python_dict[key].get("last_update_date", "")
-        repo_url = python_dict[key].get("repo_url", "")
-        project_name = key
-        if UPDATE_CHECK_DEBUG:
-            print(f"...checking online... \n Found...{latest_version = } // {repo_url = } // {project_name = }")
-        return latest_version, last_update_date, repo_url
-    except (error.URLError, json.JSONDecodeError) as e:
-        if UPDATE_CHECK_DEBUG:
-            print(f"Error checking online version: {e}")
-        return None, None, None
-
-
 def save_last_check_info(last_check_timestamp, latest_version, last_update_date, repo_url, project_name):
     data = {"last_check_timestamp": last_check_timestamp, "latest_version_local": latest_version, "last_update_date": last_update_date, "repo_url": repo_url,
             "project_name": project_name}
-    with open(LAST_CHECK_FILE, 'w') as file:
+    with open(UPDATE_CHECK_LAST_CHECK_FILE, 'w') as file:
         json.dump(data, file, indent=4)
 
 
 def load_last_check_info(create_if_missing=False):
     data = {}
-    if os.path.exists(LAST_CHECK_FILE):
-        with open(LAST_CHECK_FILE, 'r') as file:
+    if os.path.exists(UPDATE_CHECK_LAST_CHECK_FILE):
+        with open(UPDATE_CHECK_LAST_CHECK_FILE, 'r') as file:
             try:
                 data = json.load(file)
                 return data
@@ -102,7 +67,7 @@ def load_last_check_info(create_if_missing=False):
         default_timestamp = 0
         default_version = None
         data = {"last_check_timestamp": default_timestamp, "last_update_date": '', "latest_version_local": default_version, "repo_url": '', "project_name": ''}
-        with open(LAST_CHECK_FILE, 'w') as file:
+        with open(UPDATE_CHECK_LAST_CHECK_FILE, 'w') as file:
             json.dump(data, file, indent=4)
 
     return data
@@ -113,7 +78,7 @@ def update_check_thread(project_name, local_tool_version_f):
     Start a thread and check online if latest_version exists.
     If yes, store this in local json. Tool will get the info from local_json in next tool run and compare this with tool version
     """
-    with lock:
+    with update_check_lock:
         data = load_last_check_info(create_if_missing=True)
         # last_check_timestamp, local_latest_version = data.get("last_check_timestamp", 0), data.get("latest_version_local")
         last_check_timestamp, local_latest_version = data.get("last_check_timestamp", 0), data.get("latest_version_local")
@@ -129,7 +94,7 @@ def update_check_thread(project_name, local_tool_version_f):
                 try:
                     if version_str_to_tuple(latest_version) > version_str_to_tuple(local_tool_version_f):
                         if UPDATE_CHECK_DEBUG:
-                            print(f"{'-'*40} Checking online!!! {'-'*40}")
+                            print(f"{'-' * 40} Checking online!!! {'-' * 40}")
                             print(f"New version available: {latest_version}")
                             print(f"last_update_date: {last_update_date}")
                             print(f"Repository URL: {repo_url}")
@@ -187,7 +152,7 @@ def main_tool_update_check(project_name, local_tool_version_f):
         update_thread.join()
 
         if UPDATE_CHECK_DEBUG:
-            print(f"\n{'='*100} \n{update_needed = } \n{temp_json_latest_version = } \n{last_update_date = } \n{repo_url = }\n{'='*100} ")
+            print(f"\n{'=' * 100} \n{update_needed = } \n{temp_json_latest_version = } \n{last_update_date = } \n{repo_url = }\n{'=' * 100} ")
         return update_needed, temp_json_latest_version, last_update_date, repo_url
     except Exception as e:
         if UPDATE_CHECK_DEBUG:

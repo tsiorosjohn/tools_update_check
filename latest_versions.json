@@ -1,6 +1,12 @@
 {
-  "latest_version": "4.4.1",
-  "last_update_date": "08.11.2023",
-  "repo_url": "https://gitlabe2.ext.net.nokia.com/tsioros/TDT_simple",
-  "project_name": "tdt"
+  "tdt": {
+    "latest_version": "4.4.1",
+    "last_update_date": "08.11.2023",
+    "repo_url": "https://gitlabe2.ext.net.nokia.com/tsioros/TDT_simple"
+  },
+  "test_project": {
+    "latest_version": "1.0.0",
+    "last_update_date": "10.11.2023",
+    "repo_url": "https://example.com/another_project"
+  }
 }

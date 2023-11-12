@@ -4,9 +4,24 @@
     "last_update_date": "08.11.2023",
     "repo_url": "https://gitlabe2.ext.net.nokia.com/tsioros/TDT_simple"
   },
-  "test_project": {
-    "latest_version": "1.0.0",
-    "last_update_date": "10.11.2023",
-    "repo_url": "https://example.com/another_project"
+  "capscli_decrypt": {
+    "latest_version": "1.8.0",
+    "last_update_date": "25.09.2023",
+    "repo_url": "https://gitlabe2.ext.net.nokia.com/tsioros/capscli_decrypt"
+  },
+  "perf_parser.py": {
+    "latest_version": "1.12.0",
+    "last_update_date": "06.10.2023",
+    "repo_url": "https://gitlabe2.ext.net.nokia.com/CMMtools/perf_parsing_scripts"
+  },
+  "pcmd_parser": {
+    "latest_version": "v0.0.3_beta",
+    "last_update_date": "09.11.2023",
+    "repo_url": "https://gitlabe2.ext.net.nokia.com/CMMtools/pcmd_parser"
+  },
+  "cmmlogcollect": {
+    "latest_version": "1.7.2",
+    "last_update_date": "20.12.2022",
+    "repo_url": "https://gitlabe2.ext.net.nokia.com/CMMtools/cmmlogcollect"
   }
 }

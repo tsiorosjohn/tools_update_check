@@ -182,7 +182,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
 
 
 if __name__ == "__main__":
-    local_tool_version = '4.1.0_beta 1.2143.2023'
+    local_tool_version = '1.6.0_beta 1.2143.2023'
 
     print('Starting main')
     time.sleep(1)

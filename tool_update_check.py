@@ -191,6 +191,7 @@ if __name__ == "__main__":
     # update_needed, temp_json_latest_version, last_update_date, repo_url = upd_chk_main_tool_update_check('tdt', local_tool_version, 1)
 
     upd_chk_main_tool_update_check('tdt', local_tool_version, 1)  # todo: change to correct project
+    # todo: add update_last_check.json to .gitignore file!!!
     time.sleep(2)
 
     print('Done...')

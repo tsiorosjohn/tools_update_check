@@ -26,7 +26,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
     UPDATE_CHECK_LAST_CHECK_FILE = "update_last_check.json"
     UPDATE_CHECK_URL = "https://raw.githubusercontent.com/tsiorosjohn/tools_update_check/master/latest_versions.json"
     UPDATE_CHECK_PROXY_ADDRESS = 'http://10.158.100.2:8080'
-    UPDATE_CHECK_DEBUG = False  # todo: change to False for production
+    UPDATE_CHECK_DEBUG = True  # todo: change to False for production
 
     # Lock for thread-safe access to shared resources
     update_check_lock = threading.Lock()
@@ -86,7 +86,8 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                         print(f"WITH PROXY: {http_status_code = } // Got result with proxy!!!: {UPDATE_CHECK_PROXY_ADDRESS}")
 
                 except Exception as e_with_proxy:
-                    print(f"Error with proxy: {e_with_proxy}")
+                    if UPDATE_CHECK_DEBUG:
+                        print(f"Error with proxy: {e_with_proxy}")
                     return None, None, None, None
 
             online_data = json.loads(response.read().decode('utf-8'))
@@ -248,13 +249,14 @@ if __name__ == "__main__":
     # example call of function:
     # update_needed, temp_json_latest_version, last_update_date, repo_url = upd_chk_main_tool_update_check('tdt', local_tool_version, 1)
 
-    # upd_chk_main_tool_update_check('pcmd_parser', VERSION_DATE, 1)
-    # upd_main_thread = threading.Thread(target=upd_chk_main_tool_update_check, args=('pcmd_parser', local_tool_version, 1))
-    # upd_main_thread.start()
+    # todo: Thread usage is needed in __main__ to avoid freezing the main program
+    # todo: change 'test' to correct project
+    upd_main_thread = threading.Thread(target=upd_chk_main_tool_update_check, args=('test', local_tool_version, 1))
+    upd_main_thread.start()
 
-    upd_chk_main_tool_update_check('test', local_tool_version, 1)  # todo: change to correct project
+    # upd_chk_main_tool_update_check('test', local_tool_version, 1)
     # todo: add update_last_check.json to .gitignore file!!!
     time.sleep(2)
 
-    print('Done...')
-    # upd_main_thread.join()
+    print('Main program Done...')
+    upd_main_thread.join()

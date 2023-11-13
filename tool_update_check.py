@@ -4,6 +4,7 @@ import time
 import threading
 import re
 from urllib import request, error
+from urllib.request import Request, urlopen, ProxyHandler, build_opener, install_opener
 
 
 def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_check_frequency=7, print_update_warning=True):
@@ -24,7 +25,8 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
     """
     UPDATE_CHECK_LAST_CHECK_FILE = "update_last_check.json"
     UPDATE_CHECK_URL = "https://raw.githubusercontent.com/tsiorosjohn/tools_update_check/master/latest_versions.json"
-    UPDATE_CHECK_DEBUG = True  # todo: change to False for production
+    UPDATE_CHECK_PROXY_ADDRESS = 'http://10.158.100.2:8080'
+    UPDATE_CHECK_DEBUG = False  # todo: change to False for production
 
     # Lock for thread-safe access to shared resources
     update_check_lock = threading.Lock()
@@ -63,8 +65,30 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
         Returns:
             latest_version, last_update_date, repo_url, note ...or 4-None in case of error
         """
-        try:
-            response = request.urlopen(UPDATE_CHECK_URL)
+        try:  # try to read the online json
+            try:  # attempt initially to connect without proxy
+                response = request.urlopen(UPDATE_CHECK_URL)
+            except Exception as e_without_proxy:
+                if UPDATE_CHECK_DEBUG:
+                    print(f"Error without proxy: {e_without_proxy}")
+                # If the request without a proxy fails, try with a proxy
+                try:
+                    # Create a proxy handler
+                    proxy_handler = ProxyHandler({'http': UPDATE_CHECK_PROXY_ADDRESS, 'https': UPDATE_CHECK_PROXY_ADDRESS})
+                    # Create an opener with the proxy handler
+                    opener = build_opener(proxy_handler)
+                    # Install the opener
+                    install_opener(opener)
+                    # Open the URL with the proxy
+                    response = request.urlopen(UPDATE_CHECK_URL)
+                    http_status_code = response.getcode()
+                    if UPDATE_CHECK_DEBUG:
+                        print(f"WITH PROXY: {http_status_code = } // Got result with proxy!!!: {UPDATE_CHECK_PROXY_ADDRESS}")
+
+                except Exception as e_with_proxy:
+                    print(f"Error with proxy: {e_with_proxy}")
+                    return None, None, None, None
+
             online_data = json.loads(response.read().decode('utf-8'))
             online_data_project = online_data[project_name_f]
             latest_version = online_data_project.get("latest_version", "")
@@ -130,7 +154,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                 delay_check_in_seconds = 1
             else:
                 # delay_check_in_seconds = int(online_check_frequency) * 24 * 60 * 60  # Approximate seconds for those number of days
-                delay_check_in_seconds = 10  # for test purposes  # todo: comment this
+                delay_check_in_seconds = 30  # for test purposes  # todo: comment this
 
             # check online if delay_check_in_seconds has been elapsed - else, try to compare from locally stored (previously retrieved) 'local_latest_version'
             if current_timestamp - last_check_timestamp >= delay_check_in_seconds:
@@ -164,6 +188,9 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                 else:
                     if UPDATE_CHECK_DEBUG:
                         print("Error fetching online version or loading local version information. Proceeding with execution.")
+                    # Error fetching online version or loading local version. Update current_timestamp in order to avoid constant checking which can cause delays
+                    # if issue is relevant with & without proxy resolution:
+                    upd_chk_save_last_check_info(current_timestamp, "0.0.0", "", "", project_name_f, "")
 
             else:
                 if UPDATE_CHECK_DEBUG:
@@ -221,8 +248,13 @@ if __name__ == "__main__":
     # example call of function:
     # update_needed, temp_json_latest_version, last_update_date, repo_url = upd_chk_main_tool_update_check('tdt', local_tool_version, 1)
 
+    # upd_chk_main_tool_update_check('pcmd_parser', VERSION_DATE, 1)
+    # upd_main_thread = threading.Thread(target=upd_chk_main_tool_update_check, args=('pcmd_parser', local_tool_version, 1))
+    # upd_main_thread.start()
+
     upd_chk_main_tool_update_check('test', local_tool_version, 1)  # todo: change to correct project
     # todo: add update_last_check.json to .gitignore file!!!
     time.sleep(2)
 
     print('Done...')
+    # upd_main_thread.join()

@@ -6,8 +6,6 @@ import re
 from urllib import request, error
 from urllib.request import Request, urlopen, ProxyHandler, build_opener, install_opener
 from datetime import datetime
-import socket
-import urllib.request
 
 
 def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_check_frequency=30, print_update_warning=True):

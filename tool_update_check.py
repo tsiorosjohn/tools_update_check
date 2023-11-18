@@ -10,7 +10,7 @@ import socket
 import urllib.request
 
 
-def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_check_frequency=7, print_update_warning=True):
+def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_check_frequency=30, print_update_warning=True):
     """
     Check if update to latest version is needed for appropriate tool.
     One function with sub-functions for easy porting to different projects
@@ -26,11 +26,12 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
         last_update_date: last date that updated version was released
         repo_url: download URL of latest tool
     """
+    UPDATE_CHECK_NEEDED = True  # Set to 'True' if you need periodic checks if tool updates are needed or 'False' if you need to disable the check for possible updates
     UPDATE_CHECK_LAST_CHECK_FILE = "update_last_check.json"
     UPDATE_CHECK_URL = "https://raw.githubusercontent.com/tsiorosjohn/tools_update_check/master/latest_versions.json"
     UPDATE_CHECK_PROXY_ADDRESS = 'http://10.158.100.2:8080'
-    UPDATE_CHECK_TIMEOUT = 3  # todo: working for windows, but not for WSL2 - in WSL2 it's default to 20 seconds
     UPDATE_CHECK_DEBUG = True  # todo: change to False for production
+    UPDATE_CHECK_TIMEOUT = 4  # Seconds to wait urlopen prior to timeout (not works for WSL2)
 
     # Lock for thread-safe access to shared resources
     update_check_lock = threading.Lock()
@@ -71,8 +72,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
         """
         try:  # try to read the online json
             try:  # attempt initially to connect without proxy
-                response = request.urlopen(UPDATE_CHECK_URL)
-                # response = request.urlopen(UPDATE_CHECK_URL, timeout=UPDATE_CHECK_TIMEOUT)
+                response = request.urlopen(UPDATE_CHECK_URL, timeout=UPDATE_CHECK_TIMEOUT)
             except Exception as e_without_proxy:
                 if UPDATE_CHECK_DEBUG:
                     print(f"{int(time.time())}: Error without proxy: {e_without_proxy}")
@@ -85,7 +85,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                     # Install the opener
                     install_opener(opener)
                     # Open the URL with the proxy
-                    response = request.urlopen(UPDATE_CHECK_URL)
+                    response = request.urlopen(UPDATE_CHECK_URL, timeout=UPDATE_CHECK_TIMEOUT)
                     http_status_code = response.getcode()
                     if UPDATE_CHECK_DEBUG:
                         print(f"{int(time.time())}: WITH PROXY: {http_status_code = } // Got result with proxy!!!: {UPDATE_CHECK_PROXY_ADDRESS}")
@@ -151,6 +151,11 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
         Start a thread and check online if latest_version exists.
         If yes, store this in local json. Tool will get the info from local_json in next tool run and compare this with tool version
         """
+        if not UPDATE_CHECK_NEEDED:
+            if UPDATE_CHECK_DEBUG:
+                print(f"{UPDATE_CHECK_NEEDED = }. Exiting...")
+            exit(0)
+
         with update_check_lock:
             data_d = upd_chk_load_last_check_info(create_if_missing=True)
             # last_check_timestamp, local_latest_version = data.get("last_check_timestamp", 0), data.get("latest_version_local")
@@ -162,10 +167,12 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                 delay_check_in_seconds = 1
             else:
                 # delay_check_in_seconds = int(online_check_frequency) * 24 * 60 * 60  # Approximate seconds for those number of days
-                delay_check_in_seconds = 15  # for test purposes  # todo: comment this
+                delay_check_in_seconds = 15  # for test purposes  # todo: comment this. Set actual days of check frequency
 
             # check online if delay_check_in_seconds has been elapsed - else, try to compare from locally stored (previously retrieved) 'local_latest_version'
             if current_timestamp - last_check_timestamp >= delay_check_in_seconds:
+                if UPDATE_CHECK_DEBUG:
+                    print(f"{int(time.time())}:  {current_timestamp - last_check_timestamp = } ...checking online...")
                 latest_version, last_update_date, repo_url, note_f = upd_chk_check_online_version(project_name_f)
 
                 if latest_version is not None:
@@ -202,7 +209,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
 
             else:
                 if UPDATE_CHECK_DEBUG:
-                    print(f"Online check already performed within the last {online_check_frequency_f} days. No need to re-check online!!!\n"
+                    print(f"Online check already performed at {human_readable_timestamp}, i.e. within the last {online_check_frequency} days. No need to re-check online!!!\n"
                           f"Latest version retrieved from local JSON temp file: '{local_latest_version}'")
 
     try:
@@ -228,7 +235,11 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                 update_needed_f = True
             else:
                 if UPDATE_CHECK_DEBUG:
-                    print(f"You have already the latest version, found from local-json: {temp_json_latest_version_f}. No need to update")
+                    if temp_json_latest_version_f == '0.0.0':  # hardcoded value in case it's not possible to fetch actual version from GitHub
+                        print(f"\nVersion: {temp_json_latest_version_f}, found from local-json. \n"
+                              f"Seems that there was not possible to fetch actual version from GitHub...so, check is abandoned...")
+                    else:
+                        print(f"You have already the latest version, found from local-json: {temp_json_latest_version_f}. No need to update")
         # Wait for the update check thread to finish before exiting the main thread
         # update_thread.join()
 
@@ -259,7 +270,8 @@ if __name__ == "__main__":
 
     # todo: Thread usage is needed in __main__ to avoid freezing the main program
     # todo: change 'test' to correct project
-    upd_main_thread = threading.Thread(target=upd_chk_main_tool_update_check, args=('test', local_tool_version, 1))
+    # todo: Set to e.g. 15 days or 1 month for WSL2 tools, as there may be delay issues or proxy which adds delay to WSL2!
+    upd_main_thread = threading.Thread(target=upd_chk_main_tool_update_check, args=('test', local_tool_version, 15))
     upd_main_thread.start()
 
     # upd_chk_main_tool_update_check('test', local_tool_version, 1)
@@ -267,4 +279,4 @@ if __name__ == "__main__":
     time.sleep(2)
 
     print('Main program Done...')
-    upd_main_thread.join(timeout=3)
+    upd_main_thread.join(timeout=5)

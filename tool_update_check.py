@@ -4,7 +4,6 @@ import time
 import threading
 import re
 from urllib import request, error
-from urllib.request import Request, urlopen, ProxyHandler, build_opener, install_opener
 from datetime import datetime
 
 
@@ -77,11 +76,11 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                 # If the request without a proxy fails, try with a proxy
                 try:
                     # Create a proxy handler
-                    proxy_handler = ProxyHandler({'http': UPDATE_CHECK_PROXY_ADDRESS, 'https': UPDATE_CHECK_PROXY_ADDRESS})
+                    proxy_handler = request.ProxyHandler({'http': UPDATE_CHECK_PROXY_ADDRESS, 'https': UPDATE_CHECK_PROXY_ADDRESS})
                     # Create an opener with the proxy handler
-                    opener = build_opener(proxy_handler)
+                    opener = request.build_opener(proxy_handler)
                     # Install the opener
-                    install_opener(opener)
+                    request.install_opener(opener)
                     # Open the URL with the proxy
                     response = request.urlopen(UPDATE_CHECK_URL, timeout=UPDATE_CHECK_TIMEOUT)
                     http_status_code = response.getcode()
@@ -247,14 +246,14 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
         if update_needed_f and print_update_warning:
             print(f"New version '{temp_json_latest_version_f} - {last_update_date_f}' of tool is available to be downloaded from '{repo_url_f}'.\n"
                   f"{note}")
-        return update_needed_f, temp_json_latest_version_f, last_update_date_f, repo_url_f
+        return update_needed_f, temp_json_latest_version_f, last_update_date_f, repo_url_f, note
     except Exception as e:
         if UPDATE_CHECK_DEBUG:
             print(f"An exception occurred: {e}")
             return False, None, None, None
         else:
             pass  # Do nothing when DEBUG is False
-            return False, None, None, None
+            return False, None, None, None, None
 
 
 if __name__ == "__main__":
@@ -271,10 +270,20 @@ if __name__ == "__main__":
     # todo: Set to e.g. 15 days or 1 month for WSL2 tools, as there may be delay issues or proxy which adds delay to WSL2!
     upd_main_thread = threading.Thread(target=upd_chk_main_tool_update_check, args=('test', local_tool_version, 15))
     upd_main_thread.start()
-
-    # upd_chk_main_tool_update_check('test', local_tool_version, 1)
     # todo: add update_last_check.json to .gitignore file!!!
-    time.sleep(2)
 
+    time.sleep(2)
     print('Main program Done...')
+
+    # todo: add thread.join at the end of main:
     upd_main_thread.join(timeout=5)
+
+
+    ### alternative usage (e.g. in GUIs / tkinter):
+    # warn_text = ''
+    # try:
+    #     update_needed_f, temp_json_latest_version_f, last_update_date_f, repo_url_f, note = upd_chk_main_tool_update_check('tdt', VERSION_DATE, 1)
+    #     if update_needed_f:
+    #         warn_text = f"New version '{temp_json_latest_version_f} - {last_update_date_f}' of tool is available to be downloaded!\n {note}"
+    # except Exception as e:
+    #     pass

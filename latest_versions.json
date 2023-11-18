@@ -1,7 +1,7 @@
 {
   "tdt": {
-    "latest_version": "4.5.0",
-    "last_update_date": "13.11.2023",
+    "latest_version": "4.5.1",
+    "last_update_date": "19.11.2023",
     "repo_url": "https://gitlabe2.ext.net.nokia.com/tsioros/TDT_simple",
     "note": "added: Support for automatic check for online updates"
   },

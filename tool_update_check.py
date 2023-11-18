@@ -5,6 +5,9 @@ import threading
 import re
 from urllib import request, error
 from urllib.request import Request, urlopen, ProxyHandler, build_opener, install_opener
+from datetime import datetime
+import socket
+import urllib.request
 
 
 def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_check_frequency=7, print_update_warning=True):
@@ -26,6 +29,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
     UPDATE_CHECK_LAST_CHECK_FILE = "update_last_check.json"
     UPDATE_CHECK_URL = "https://raw.githubusercontent.com/tsiorosjohn/tools_update_check/master/latest_versions.json"
     UPDATE_CHECK_PROXY_ADDRESS = 'http://10.158.100.2:8080'
+    UPDATE_CHECK_TIMEOUT = 3  # todo: working for windows, but not for WSL2 - in WSL2 it's default to 20 seconds
     UPDATE_CHECK_DEBUG = True  # todo: change to False for production
 
     # Lock for thread-safe access to shared resources
@@ -68,9 +72,10 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
         try:  # try to read the online json
             try:  # attempt initially to connect without proxy
                 response = request.urlopen(UPDATE_CHECK_URL)
+                # response = request.urlopen(UPDATE_CHECK_URL, timeout=UPDATE_CHECK_TIMEOUT)
             except Exception as e_without_proxy:
                 if UPDATE_CHECK_DEBUG:
-                    print(f"Error without proxy: {e_without_proxy}")
+                    print(f"{int(time.time())}: Error without proxy: {e_without_proxy}")
                 # If the request without a proxy fails, try with a proxy
                 try:
                     # Create a proxy handler
@@ -83,11 +88,11 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                     response = request.urlopen(UPDATE_CHECK_URL)
                     http_status_code = response.getcode()
                     if UPDATE_CHECK_DEBUG:
-                        print(f"WITH PROXY: {http_status_code = } // Got result with proxy!!!: {UPDATE_CHECK_PROXY_ADDRESS}")
+                        print(f"{int(time.time())}: WITH PROXY: {http_status_code = } // Got result with proxy!!!: {UPDATE_CHECK_PROXY_ADDRESS}")
 
                 except Exception as e_with_proxy:
                     if UPDATE_CHECK_DEBUG:
-                        print(f"Error with proxy: {e_with_proxy}")
+                        print(f"{int(time.time())}: Error with proxy: {e_with_proxy}")
                     return None, None, None, None
 
             online_data = json.loads(response.read().decode('utf-8'))
@@ -102,11 +107,11 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                 print(f"Error checking online version: {ex}")
             return None, None, None, None
 
-    def upd_chk_save_last_check_info(last_check_timestamp, latest_version, last_update_date, repo_url, project_name_f, note_f):
+    def upd_chk_save_last_check_info(last_check_timestamp, last_check_timestamp_h, latest_version, last_update_date, repo_url, project_name_f, note_f):
         """
         Saves retrieved info in local json file
         """
-        data_d = {"last_check_timestamp": last_check_timestamp, "latest_version_local": latest_version, "last_update_date": last_update_date,
+        data_d = {"last_check_timestamp": last_check_timestamp, "last_check_timestamp_human_readable": last_check_timestamp_h, "latest_version_local": latest_version, "last_update_date": last_update_date,
                   "repo_url": repo_url, "project_name": project_name_f, "note": note_f}
         with open(UPDATE_CHECK_LAST_CHECK_FILE, 'w') as file:
             json.dump(data_d, file, indent=2)
@@ -134,7 +139,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
             # Create a new last_check.json file with default values
             default_timestamp = 0
             default_version = None
-            data_f = {"last_check_timestamp": default_timestamp, "last_update_date": '', "latest_version_local": default_version, "repo_url": '',
+            data_f = {"last_check_timestamp": default_timestamp, "last_check_timestamp_human_readable": default_timestamp, "last_update_date": '', "latest_version_local": default_version, "repo_url": '',
                       "project_name": '', "note": ''}
             with open(UPDATE_CHECK_LAST_CHECK_FILE, 'w') as file:
                 json.dump(data_f, file, indent=2)
@@ -151,11 +156,13 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
             # last_check_timestamp, local_latest_version = data.get("last_check_timestamp", 0), data.get("latest_version_local")
             last_check_timestamp, local_latest_version = data_d.get("last_check_timestamp", 0), data_d.get("latest_version_local")
             current_timestamp = time.time()
+            human_readable_timestamp = datetime.fromtimestamp(current_timestamp).strftime('%Y-%m-%d %H:%M:%S')
+
             if online_check_frequency_f == 'always':
                 delay_check_in_seconds = 1
             else:
                 # delay_check_in_seconds = int(online_check_frequency) * 24 * 60 * 60  # Approximate seconds for those number of days
-                delay_check_in_seconds = 30  # for test purposes  # todo: comment this
+                delay_check_in_seconds = 15  # for test purposes  # todo: comment this
 
             # check online if delay_check_in_seconds has been elapsed - else, try to compare from locally stored (previously retrieved) 'local_latest_version'
             if current_timestamp - last_check_timestamp >= delay_check_in_seconds:
@@ -178,7 +185,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                             if UPDATE_CHECK_DEBUG:
                                 print("You have the latest version. Proceeding with execution.")
                         # Save the new version and timestamp to the local JSON file
-                        upd_chk_save_last_check_info(current_timestamp, latest_version, last_update_date, repo_url, project_name_f, note_f)
+                        upd_chk_save_last_check_info(current_timestamp, human_readable_timestamp, latest_version, last_update_date, repo_url, project_name_f, note_f)
                     except TypeError as ex:
                         if UPDATE_CHECK_DEBUG:
                             print(f"An exception occurred: {ex}")
@@ -191,7 +198,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                         print("Error fetching online version or loading local version information. Proceeding with execution.")
                     # Error fetching online version or loading local version. Update current_timestamp in order to avoid constant checking which can cause delays
                     # if issue is relevant with & without proxy resolution:
-                    upd_chk_save_last_check_info(current_timestamp, "0.0.0", "", "", project_name_f, "")
+                    upd_chk_save_last_check_info(current_timestamp, human_readable_timestamp, "0.0.0", "", "", project_name_f, "")
 
             else:
                 if UPDATE_CHECK_DEBUG:
@@ -201,10 +208,11 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
     try:
         update_needed_f = False
         # Create a separate thread for the update check
-        update_thread = threading.Thread(target=upd_chk_update_check_thread, args=(project_name, local_tool_version_f, online_check_frequency))
+        # update_thread = threading.Thread(target=upd_chk_update_check_thread, args=(project_name, local_tool_version_f, online_check_frequency))
+        upd_chk_update_check_thread(project_name, local_tool_version_f, online_check_frequency)
 
         # Start the update check thread in the background
-        update_thread.start()
+        # update_thread.start()
 
         # check from local json if update is needed and display appropriate warning
         data = upd_chk_load_last_check_info()
@@ -222,7 +230,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                 if UPDATE_CHECK_DEBUG:
                     print(f"You have already the latest version, found from local-json: {temp_json_latest_version_f}. No need to update")
         # Wait for the update check thread to finish before exiting the main thread
-        update_thread.join()
+        # update_thread.join()
 
         if UPDATE_CHECK_DEBUG:
             print(f"\n{'=' * 100} \n{update_needed_f = } \n{temp_json_latest_version_f = } \n{last_update_date_f = } \n{repo_url_f = }\n{'=' * 100} ")
@@ -259,4 +267,4 @@ if __name__ == "__main__":
     time.sleep(2)
 
     print('Main program Done...')
-    upd_main_thread.join()
+    upd_main_thread.join(timeout=3)

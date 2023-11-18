@@ -104,11 +104,11 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                 print(f"Error checking online version: {ex}")
             return None, None, None, None
 
-    def upd_chk_save_last_check_info(last_check_timestamp, last_check_timestamp_h, latest_version, last_update_date, repo_url, project_name_f, note_f):
+    def upd_chk_save_last_check_info(last_check_timestamp, last_check_timestamp_h, online_check_frequency_f, latest_version, last_update_date, repo_url, project_name_f, note_f):
         """
         Saves retrieved info in local json file
         """
-        data_d = {"last_check_timestamp": last_check_timestamp, "last_check_timestamp_human_readable": last_check_timestamp_h, "latest_version_local": latest_version, "last_update_date": last_update_date,
+        data_d = {"last_check_timestamp": last_check_timestamp, "last_check_timestamp_human_readable": last_check_timestamp_h, "online_check_frequency_days": online_check_frequency_f, "latest_version_local": latest_version, "last_update_date": last_update_date,
                   "repo_url": repo_url, "project_name": project_name_f, "note": note_f}
         with open(UPDATE_CHECK_LAST_CHECK_FILE, 'w') as file:
             json.dump(data_d, file, indent=2)
@@ -189,7 +189,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                             if UPDATE_CHECK_DEBUG:
                                 print("You have the latest version. Proceeding with execution.")
                         # Save the new version and timestamp to the local JSON file
-                        upd_chk_save_last_check_info(current_timestamp, human_readable_timestamp, latest_version, last_update_date, repo_url, project_name_f, note_f)
+                        upd_chk_save_last_check_info(current_timestamp, human_readable_timestamp, online_check_frequency_f, latest_version, last_update_date, repo_url, project_name_f, note_f)
                     except TypeError as ex:
                         if UPDATE_CHECK_DEBUG:
                             print(f"An exception occurred: {ex}")
@@ -202,7 +202,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                         print("Error fetching online version or loading local version information. Proceeding with execution.")
                     # Error fetching online version or loading local version. Update current_timestamp in order to avoid constant checking which can cause delays
                     # if issue is relevant with & without proxy resolution:
-                    upd_chk_save_last_check_info(current_timestamp, human_readable_timestamp, "0.0.0", "", "", project_name_f, "")
+                    upd_chk_save_last_check_info(current_timestamp, human_readable_timestamp, online_check_frequency_f, "0.0.0", "", "", project_name_f, "")
 
             else:
                 if UPDATE_CHECK_DEBUG:

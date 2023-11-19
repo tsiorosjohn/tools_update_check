@@ -23,7 +23,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
         last_update_date: last date that updated version was released
         repo_url: download URL of latest tool
     """
-    UPDATE_CHECK_NEEDED = True  # Set to 'True' if you need periodic checks if tool updates are needed or 'False' if you need to disable the check for possible updates
+    UPDATE_CHECK_NEEDED = True  # Set to 'True' if you need periodic checks for tool-updates, or 'False' if you need to disable the update-check
     UPDATE_CHECK_LAST_CHECK_FILE = "update_last_check.json"
     UPDATE_CHECK_URL = "https://raw.githubusercontent.com/tsiorosjohn/tools_update_check/master/latest_versions.json"
     UPDATE_CHECK_PROXY_ADDRESS = 'http://10.158.100.2:8080'
@@ -279,7 +279,7 @@ if __name__ == "__main__":
     upd_main_thread.join(timeout=5)
 
 
-    ### alternative usage (e.g. in GUIs / tkinter):
+    ### alternative usage (e.g. in GUIs / tkinter), when there is NO need for multi-threading:
     # warn_text = ''
     # try:
     #     update_needed_f, temp_json_latest_version_f, last_update_date_f, repo_url_f, note = upd_chk_main_tool_update_check('tdt', VERSION_DATE, 1)

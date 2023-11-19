@@ -24,10 +24,10 @@
     "note": "added: Support for automatic check for online updates"
   },
   "cmmlogcollect": {
-    "latest_version": "1.7.2",
-    "last_update_date": "20.12.2022",
+    "latest_version": "1.7.3",
+    "last_update_date": "19.11.2023",
     "repo_url": "https://gitlabe2.ext.net.nokia.com/CMMtools/cmmlogcollect",
-    "note": ""
+    "note": "added: Support for automatic check for online updates"
   },
   "test": {
     "latest_version": "1.7.2",

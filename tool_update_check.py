@@ -27,7 +27,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
     UPDATE_CHECK_LAST_CHECK_FILE = "update_last_check.json"
     UPDATE_CHECK_URL = "https://raw.githubusercontent.com/tsiorosjohn/tools_update_check/master/latest_versions.json"
     UPDATE_CHECK_PROXY_ADDRESS = 'http://10.158.100.2:8080'
-    UPDATE_CHECK_DEBUG = True  # todo: change to False for production
+    UPDATE_CHECK_DEBUG = True  # todo: 3. change to False for production
     UPDATE_CHECK_TIMEOUT = 4  # Seconds to wait urlopen prior to timeout (not works for WSL2)
 
     # Lock for thread-safe access to shared resources
@@ -164,7 +164,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                 delay_check_in_seconds = 1
             else:
                 # delay_check_in_seconds = int(online_check_frequency) * 24 * 60 * 60  # Approximate seconds for those number of days
-                delay_check_in_seconds = 15  # for test purposes  # todo: comment this. Set actual days of check frequency
+                delay_check_in_seconds = 15  # for test purposes  # todo: 4. comment this. Set actual days of check frequency
 
             # check online if delay_check_in_seconds has been elapsed - else, try to compare from locally stored (previously retrieved) 'local_latest_version'
             if current_timestamp - last_check_timestamp >= delay_check_in_seconds:
@@ -265,19 +265,20 @@ if __name__ == "__main__":
     # example call of function:
     # update_needed, temp_json_latest_version, last_update_date, repo_url = upd_chk_main_tool_update_check('tdt', local_tool_version, 1)
 
-    # todo: Thread usage is needed in __main__ to avoid freezing the main program
-    # todo: change 'test' to correct project
-    # todo: Set to e.g. 15 days or 1 month for WSL2 tools, as there may be delay issues or proxy which adds delay to WSL2!
+    # todo: 1. add update_last_check.json to .gitignore file!!!
+    # todo: 2. add relevant imports to project
+
+    # todo: 5. Thread usage is needed in __main__ to avoid freezing the main program
+    # todo: 6. a) change 'test' to correct project
+    # todo: 6. b) Set to e.g. 15 days or 1 month for WSL2 tools, as there may be delay issues or proxy which adds delay to WSL2!
     upd_main_thread = threading.Thread(target=upd_chk_main_tool_update_check, args=('test', local_tool_version, 15))
     upd_main_thread.start()
-    # todo: add update_last_check.json to .gitignore file!!!
 
     time.sleep(2)
     print('Main program Done...')
 
-    # todo: add thread.join at the end of main:
+    # todo: 7. add thread.join at the end of main:
     upd_main_thread.join(timeout=5)
-
 
     ### alternative usage (e.g. in GUIs / tkinter), when there is NO need for multi-threading:
     # warn_text = ''

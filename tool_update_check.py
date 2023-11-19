@@ -5,9 +5,10 @@ import threading
 import re
 from urllib import request, error
 from datetime import datetime
+from typing import Union
 
 
-def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_check_frequency=30, print_update_warning=True):
+def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_check_frequency: Union[int, str] = 30, print_update_warning=True):
     """
     Check if update to latest version is needed for appropriate tool.
     One function with sub-functions for easy porting to different projects
@@ -104,11 +105,13 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                 print(f"Error checking online version: {ex}")
             return None, None, None, None
 
-    def upd_chk_save_last_check_info(last_check_timestamp, last_check_timestamp_h, online_check_frequency_f, latest_version, last_update_date, repo_url, project_name_f, note_f):
+    def upd_chk_save_last_check_info(last_check_timestamp, last_check_timestamp_h, online_check_frequency_f, latest_version, last_update_date, repo_url,
+                                     project_name_f, note_f):
         """
         Saves retrieved info in local json file
         """
-        data_d = {"last_check_timestamp": last_check_timestamp, "last_check_timestamp_human_readable": last_check_timestamp_h, "online_check_frequency_days": online_check_frequency_f, "latest_version_local": latest_version, "last_update_date": last_update_date,
+        data_d = {"last_check_timestamp": last_check_timestamp, "last_check_timestamp_human_readable": last_check_timestamp_h,
+                  "online_check_frequency_days": online_check_frequency_f, "latest_version_local": latest_version, "last_update_date": last_update_date,
                   "repo_url": repo_url, "project_name": project_name_f, "note": note_f}
         with open(UPDATE_CHECK_LAST_CHECK_FILE, 'w') as file:
             json.dump(data_d, file, indent=2)
@@ -136,7 +139,8 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
             # Create a new last_check.json file with default values
             default_timestamp = 0
             default_version = None
-            data_f = {"last_check_timestamp": default_timestamp, "last_check_timestamp_human_readable": default_timestamp, "last_update_date": '', "latest_version_local": default_version, "repo_url": '',
+            data_f = {"last_check_timestamp": default_timestamp, "last_check_timestamp_human_readable": default_timestamp, "last_update_date": '',
+                      "latest_version_local": default_version, "repo_url": '',
                       "project_name": '', "note": ''}
             with open(UPDATE_CHECK_LAST_CHECK_FILE, 'w') as file:
                 json.dump(data_f, file, indent=2)
@@ -189,7 +193,8 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                             if UPDATE_CHECK_DEBUG:
                                 print("You have the latest version. Proceeding with execution.")
                         # Save the new version and timestamp to the local JSON file
-                        upd_chk_save_last_check_info(current_timestamp, human_readable_timestamp, online_check_frequency_f, latest_version, last_update_date, repo_url, project_name_f, note_f)
+                        upd_chk_save_last_check_info(current_timestamp, human_readable_timestamp, online_check_frequency_f, latest_version, last_update_date,
+                                                     repo_url, project_name_f, note_f)
                     except TypeError as ex:
                         if UPDATE_CHECK_DEBUG:
                             print(f"An exception occurred: {ex}")
@@ -206,8 +211,9 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
 
             else:
                 if UPDATE_CHECK_DEBUG:
-                    print(f"Online check already performed at {human_readable_timestamp}, i.e. within the last {online_check_frequency} days. No need to re-check online!!!\n"
-                          f"Latest version retrieved from local JSON temp file: '{local_latest_version}'")
+                    print(
+                        f"Online check already performed at {human_readable_timestamp}, i.e. within the last {online_check_frequency} days. No need to re-check online!!!\n"
+                        f"Latest version retrieved from local JSON temp file: '{local_latest_version}'")
 
     try:
         update_needed_f = False

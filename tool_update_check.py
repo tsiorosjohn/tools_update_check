@@ -284,6 +284,11 @@ if __name__ == "__main__":
     print('Main program Done...')
 
     # todo: 7. add thread.join at the end of main:
+
+    # todo: 8. It may be needed just after update-check thread and prior starting of main tool,
+    # in order to give time for update-thread to print the check info prior of starting of the tool:
+    time.sleep(0.05)
+
     upd_main_thread.join(timeout=5)
 
     ### alternative usage (e.g. in GUIs / tkinter), when there is NO need for multi-threading:

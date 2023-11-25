@@ -1,9 +1,9 @@
 {
   "tdt": {
-    "latest_version": "4.5.2",
-    "last_update_date": "20.11.2023",
+    "latest_version": "4.5.3",
+    "last_update_date": "25.11.2023",
     "repo_url": "https://gitlabe2.ext.net.nokia.com/tsioros/TDT_simple",
-    "note": "added: Support for automatic check for online updates"
+    "note": "fixed: `ignore_case_list` can have either PRB or Incident. Previously it was working only with PRB when a tierless case had also PRB"
   },
   "capscli_decrypt": {
     "latest_version": "1.9.1",

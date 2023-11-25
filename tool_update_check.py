@@ -285,7 +285,7 @@ if __name__ == "__main__":
 
     # todo: 7. add thread.join at the end of main:
 
-    # todo: 8. It may be needed just after update-check thread and prior starting of main tool,
+    # todo: 8. It may be needed just after update-check thread (upd_main_thread.start()) and prior starting of main tool,
     # in order to give time for update-thread to print the check info prior of starting of the tool:
     time.sleep(0.05)
 

@@ -8,7 +8,8 @@ from datetime import datetime
 from typing import Union
 
 
-def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_check_frequency: Union[int, str] = 30, print_update_warning=True):
+def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_check_frequency: Union[int, str] = 30, print_update_warning=True,
+                                   check_only_locally=False):
     """
     Check if update to latest version is needed for appropriate tool.
     One function with sub-functions for easy porting to different projects
@@ -17,6 +18,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
         local_tool_version_f: actual local tool version; could be outdated
         online_check_frequency: how often online JSON of latest versions have to be checked ('always', or <int>: days)
         print_update_warning: False if no print warning is necessary (e.g. need to handle proprietary the warning, or 'use-case' of calling with '-v' args cli)
+        check_only_locally: Set to True if there is NO need to check online. E.g. in cases that update has just retrieved and need to pass the output to user
 
     Returns:
         update_needed: bool
@@ -147,16 +149,19 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
 
         return data_f
 
+    def upd_chk_is_update_needed_flag_set():
+        if UPDATE_CHECK_NEEDED:
+            return True
+        elif not UPDATE_CHECK_NEEDED:
+            if UPDATE_CHECK_DEBUG:
+                print(f"{UPDATE_CHECK_NEEDED = }. Exiting...")
+                return False
+
     def upd_chk_update_check_thread(project_name_f, local_tool_vers, online_check_frequency_f):
         """
         Start a thread and check online if latest_version exists.
         If yes, store this in local json. Tool will get the info from local_json in next tool run and compare this with tool version
         """
-        if not UPDATE_CHECK_NEEDED:
-            if UPDATE_CHECK_DEBUG:
-                print(f"{UPDATE_CHECK_NEEDED = }. Exiting...")
-            exit(0)
-
         with update_check_lock:
             data_d = upd_chk_load_last_check_info(create_if_missing=True)
             # last_check_timestamp, local_latest_version = data.get("last_check_timestamp", 0), data.get("latest_version_local")
@@ -219,8 +224,15 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
         update_needed_f = False
         # Create a separate thread for the update check
         # update_thread = threading.Thread(target=upd_chk_update_check_thread, args=(project_name, local_tool_version_f, online_check_frequency))
-        upd_chk_update_check_thread(project_name, local_tool_version_f, online_check_frequency)
-
+        if not check_only_locally:
+            if not upd_chk_is_update_needed_flag_set():
+                return
+            else:
+                upd_chk_update_check_thread(project_name, local_tool_version_f, online_check_frequency)
+        if check_only_locally and UPDATE_CHECK_DEBUG:
+            print(f"\n!!!!! Call of update-check function with argument: check only Locally!!! ")
+            if not upd_chk_is_update_needed_flag_set():
+                return
         # Start the update check thread in the background
         # update_thread.start()
 
@@ -251,7 +263,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
 
         if update_needed_f and print_update_warning:
             print(f"New version '{temp_json_latest_version_f} - {last_update_date_f}' of tool is available to be downloaded from '{repo_url_f}'.\n"
-                  f"{note}")
+                  f"    {note}")
         return update_needed_f, temp_json_latest_version_f, last_update_date_f, repo_url_f, note
     except Exception as e:
         if UPDATE_CHECK_DEBUG:
@@ -277,19 +289,27 @@ if __name__ == "__main__":
     # todo: 5. Thread usage is needed in __main__ to avoid freezing the main program
     # todo: 6. a) change 'test' to correct project
     # todo: 6. b) Set to e.g. 15 days or 1 month for WSL2 tools, as there may be delay issues or proxy which adds delay to WSL2!
-    upd_main_thread = threading.Thread(target=upd_chk_main_tool_update_check, args=('test', local_tool_version, 15))
+    # upd_main_thread = threading.Thread(target=upd_chk_main_tool_update_check, args=('test', local_tool_version, 15))
+    upd_main_thread = threading.Thread(target=upd_chk_main_tool_update_check, args=('test', local_tool_version, 30), kwargs={'print_update_warning': False})
     upd_main_thread.start()
+    # in order to give time for update-thread to print the check info prior of starting of the tool:
+    # time.sleep(0.05)
 
     time.sleep(2)
     print('Main program Done...')
 
-    # todo: 7. add thread.join at the end of main:
+    # todo: 7. add thread.join at the end of main // or add the below .join() together with .is_alive()
 
-    # todo: 8. It may be needed just after update-check thread (upd_main_thread.start()) and prior starting of main tool,
-    # in order to give time for update-thread to print the check info prior of starting of the tool:
-    time.sleep(0.05)
-
-    upd_main_thread.join(timeout=5)
+    # upd_main_thread.join(timeout=5)
+    if upd_main_thread.is_alive():
+        print("\nChecking online for updates. This check takes place once every 30 days. "
+              "\nPlease wait...")
+        upd_main_thread.join(timeout=5)
+    else:
+        pass
+        # print("Main thread finished before update check.", color='red')
+    # call update-check function again with LOCAL ONLY check, in order to display the warning when tool ends:
+    upd_chk_main_tool_update_check('pcmd_parser', local_tool_version, 30, print_update_warning=True, check_only_locally=True)
 
     ### alternative usage (e.g. in GUIs / tkinter), when there is NO need for multi-threading:
     # warn_text = ''

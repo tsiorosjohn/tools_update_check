@@ -18,8 +18,8 @@
     "note": ""
   },
   "pcmd_parser": {
-    "latest_version": "0.5.1_beta",
-    "last_update_date": "26.11.2023",
+    "latest_version": "0.5.2_beta",
+    "last_update_date": "27.11.2023",
     "repo_url": "https://gitlabe2.ext.net.nokia.com/CMMtools/pcmd_parser",
     "note": "a) more menu options for MME/SGSN/AMF, b) display of available PCMD-signatures in menu"
   },

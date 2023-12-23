@@ -63,6 +63,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                 "last_update_date": "20.12.2022",
                 "repo_url": "https://test.com",
                 "note": "extra note/comment that might be need to be communicated as well",
+                "comment": "extra comment: Needed as extra description for admin purposes / not displayed or parsed locally",
                 "changelog": {
                   "0.9.1": "0.9.1 version: test 1",
                   "1.2.0": "1.2.0 version major updates & new features added...",

@@ -19,9 +19,14 @@
   },
   "pcmd_parser": {
     "latest_version": "0.5.3_beta",
-    "last_update_date": "29.11.2023",
+    "last_update_date": "19.12.2023",
     "repo_url": "https://gitlabe2.ext.net.nokia.com/CMMtools/pcmd_parser",
-    "note": "a) more menu options for MME/SGSN/AMF, b) display of available PCMD-signatures in menu"
+    "note": "",
+    "comment": "temporary latest_version set to 0.5.3_beta, in order to NOT trigger update notes to end users ",
+    "changelog": {
+      "0.6.4_beta": "19.12.2023 - a) support of parsing depending on MME PCMD version, b) bug fixes",
+      "0.5.3_beta": "29.11.2023 - first beta version for internal testing within 3LS"
+    }
   },
   "cmmlogcollect": {
     "latest_version": "1.8.0",
@@ -33,12 +38,13 @@
     "latest_version": "1.7.2",
     "last_update_date": "20.12.2022",
     "repo_url": "https://test.com",
-    "note": "extra note/comment that might be need to be communicated as well",
+    "note": "extra note that might be need to be communicated as well",
+    "comment": "extra comment: Needed as extra description for admin purposes / not displayed or parsed locally",
     "changelog": {
-      "0.9.1": "0.9.1 version: test 1",
-      "1.2.0": "1.2.0 version major updates & new features added...",
-      "1.7.2": "1.7.2 relevant features",
-      "1.7.5": "1.7.5 Planned / not-yet-implemented relevant features"
+      "1.7.5": "175 Planned / not-yet-implemented relevant features",
+      "1.7.2": "172 relevant features",
+      "1.2.0": "120 version major updates & new features added...",
+      "0.9.1_beta": "091 version: test 1"
     }
   }
 }

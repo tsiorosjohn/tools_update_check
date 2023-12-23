@@ -285,7 +285,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                   f"{repo_url_f = }\n"
                   f"{temp_json_changelog = }\n"
                   f"{'=' * 100} ")
-        if update_needed_f and print_update_warning:
+        if update_needed_f and print_update_warning:  # todo: may need to be updated to use `ColorPrint`
             print(f"- Tool installed version: '{local_tool_version_f}' \n"
                   f"- New version '{temp_json_latest_version_f} - {last_update_date_f}' of tool is available to be downloaded from '{repo_url_f}'.\n"
                   f"    {note}")

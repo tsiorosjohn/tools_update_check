@@ -3,12 +3,19 @@ Public repo for check in various tools if update to latest version is needed
 
 ```json
 {
-  "test": {
-    "latest_version": "1.7.2",
-    "last_update_date": "20.12.2022",
-    "repo_url": "https://test.com",
-    "note": "extra note/comment that might be need to be communicated as well"
-  }
+   "test": {
+      "latest_version": "1.7.2",
+      "last_update_date": "20.12.2022",
+      "repo_url": "https://test.com",
+      "note": "extra note that might be need to be communicated as well",
+      "comment": "extra comment: needed as extra description for admin purposes / not displayed or parsed locally",
+      "changelog": {
+         "1.7.5": "175 Planned / not-yet-implemented relevant features",
+         "1.7.2": "172 relevant features",
+         "1.2.0": "120 version major updates & new features added...",
+         "0.9.1_beta": "091 version: test 1"
+      }
+   }
 }
 ```
 
@@ -23,3 +30,4 @@ Public repo for check in various tools if update to latest version is needed
    - todo: change days from 15 to appropriate frequency that update check is needed 
 7. todo: add `thread.join` at the end of main
 8. `UPDATE_CHECK_NEEDED = True`: Set to `True` if you need periodic checks for tool-updates, or `False` if you don't need the update-check
+9. Section: `if update_needed_f and print_update_warning:` may need to be updated to use `ColorPrint`

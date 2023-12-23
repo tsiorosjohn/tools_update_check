@@ -39,7 +39,7 @@
     "last_update_date": "20.12.2022",
     "repo_url": "https://test.com",
     "note": "extra note that might be need to be communicated as well",
-    "comment": "extra comment: Needed as extra description for admin purposes / not displayed or parsed locally",
+    "comment": "extra comment: needed as extra description for admin purposes / not displayed or parsed locally",
     "changelog": {
       "1.7.5": "175 Planned / not-yet-implemented relevant features",
       "1.7.2": "172 relevant features",

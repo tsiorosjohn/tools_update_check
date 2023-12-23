@@ -22,9 +22,9 @@
     "last_update_date": "19.12.2023",
     "repo_url": "https://gitlabe2.ext.net.nokia.com/CMMtools/pcmd_parser",
     "note": "",
-    "comment": "temporary latest_version set to 0.5.3_beta, in order to NOT trigger update notes to end users ",
+    "comment": "temporary latest_version set to 0.5.3_beta, in order to NOT trigger update notes to end users - TO BE CHANGED to 0.7.0_beta",
     "changelog": {
-      "0.6.4_beta": "19.12.2023 - a) support of parsing depending on MME PCMD version, b) bug fixes",
+      "0.7.0_beta": "23.12.2023 - a) support of parsing depending on MME PCMD version, b) check online for changelog/updates, c) bug fixes",
       "0.5.3_beta": "29.11.2023 - first beta version for internal testing within 3LS"
     }
   },

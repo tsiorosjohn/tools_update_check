@@ -62,8 +62,14 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                 "latest_version": "1.7.2",
                 "last_update_date": "20.12.2022",
                 "repo_url": "https://test.com",
-                "note": "extra note/comment that might be need to be communicated as well"
+                "note": "extra note/comment that might be need to be communicated as well",
+                "changelog": {
+                  "0.9.1": "0.9.1 version: test 1",
+                  "1.2.0": "1.2.0 version major updates & new features added...",
+                  "1.7.2": "1.7.2 relevant features",
+                  "1.7.5": "1.7.5 Planned / not-yet-implemented relevant features"
                 }
+              }
         Args:
             project_name_f: 'key' of dictionary is the project name
 
@@ -101,20 +107,21 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
             last_update_date = online_data_project.get("last_update_date", "")
             repo_url = online_data_project.get("repo_url", "")
             note_f = online_data_project.get("note", "")
-            return latest_version, last_update_date, repo_url, note_f
+            changelog = online_data_project.get("changelog", "")
+            return latest_version, last_update_date, repo_url, note_f, changelog
         except (error.URLError, json.JSONDecodeError) as ex:
             if UPDATE_CHECK_DEBUG:
                 print(f"Error checking online version: {ex}")
-            return None, None, None, None
+            return None, None, None, None, None
 
     def upd_chk_save_last_check_info(last_check_timestamp, last_check_timestamp_h, online_check_frequency_f, latest_version, last_update_date, repo_url,
-                                     project_name_f, note_f):
+                                     project_name_f, note_f, changelog):
         """
         Saves retrieved info in local json file
         """
         data_d = {"last_check_timestamp": last_check_timestamp, "last_check_timestamp_human_readable": last_check_timestamp_h,
                   "online_check_frequency_days": online_check_frequency_f, "latest_version_local": latest_version, "last_update_date": last_update_date,
-                  "repo_url": repo_url, "project_name": project_name_f, "note": note_f}
+                  "repo_url": repo_url, "project_name": project_name_f, "note": note_f, "changelog": changelog}
         with open(UPDATE_CHECK_LAST_CHECK_FILE, 'w') as file:
             json.dump(data_d, file, indent=2)
 
@@ -179,7 +186,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
             if current_timestamp - last_check_timestamp >= delay_check_in_seconds:
                 if UPDATE_CHECK_DEBUG:
                     print(f"{int(time.time())}:  {current_timestamp - last_check_timestamp = } ...checking online...")
-                latest_version, last_update_date, repo_url, note_f = upd_chk_check_online_version(project_name_f)
+                latest_version, last_update_date, repo_url, note_f, changelog = upd_chk_check_online_version(project_name_f)
 
                 if latest_version is not None:
                     try:
@@ -191,6 +198,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                                 print(f"Repository URL: {repo_url}")
                                 print(f"Project Name: {project_name_f}")
                                 print(f"Note: {note_f}")
+                                print(f"Changelog: {changelog}")
                                 print(f"{'-' * 100}")
                             # Implement update mechanism here
 
@@ -199,7 +207,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                                 print("You have the latest version. Proceeding with execution.")
                         # Save the new version and timestamp to the local JSON file
                         upd_chk_save_last_check_info(current_timestamp, human_readable_timestamp, online_check_frequency_f, latest_version, last_update_date,
-                                                     repo_url, project_name_f, note_f)
+                                                     repo_url, project_name_f, note_f, changelog)
                     except TypeError as ex:
                         if UPDATE_CHECK_DEBUG:
                             print(f"An exception occurred: {ex}")
@@ -212,7 +220,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
                         print("Error fetching online version or loading local version information. Proceeding with execution.")
                     # Error fetching online version or loading local version. Update current_timestamp in order to avoid constant checking which can cause delays
                     # if issue is relevant with & without proxy resolution:
-                    upd_chk_save_last_check_info(current_timestamp, human_readable_timestamp, online_check_frequency_f, "0.0.0", "", "", project_name_f, "")
+                    upd_chk_save_last_check_info(current_timestamp, human_readable_timestamp, online_check_frequency_f, "0.0.0", "", "", project_name_f, "", changelog)
 
             else:
                 if UPDATE_CHECK_DEBUG:
@@ -242,6 +250,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
         temp_json_latest_version_f = data['latest_version_local']
         repo_url_f = data['repo_url']
         note = data['note']
+        changelog = data['changelog']
 
         if temp_json_latest_version_f is not None:
             if upd_chk_version_str_to_tuple(temp_json_latest_version_f) > upd_chk_version_str_to_tuple(local_tool_version_f):
@@ -259,7 +268,13 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
         # update_thread.join()
 
         if UPDATE_CHECK_DEBUG:
-            print(f"\n{'=' * 100} \n{update_needed_f = } \n{temp_json_latest_version_f = } \n{last_update_date_f = } \n{repo_url_f = }\n{'=' * 100} ")
+            print(f"\n{'=' * 100} \n"
+                  f"{update_needed_f = } \n"
+                  f"{temp_json_latest_version_f = } \n"
+                  f"{last_update_date_f = } \n"
+                  f"{repo_url_f = }\n"
+                  f"{changelog = }\n"
+                  f"{'=' * 100} ")
 
         if update_needed_f and print_update_warning:
             print(f"New version '{temp_json_latest_version_f} - {last_update_date_f}' of tool is available to be downloaded from '{repo_url_f}'.\n"
@@ -319,3 +334,5 @@ if __name__ == "__main__":
     #         warn_text = f"New version '{temp_json_latest_version_f} - {last_update_date_f}' of tool is available to be downloaded!\n {note}"
     # except Exception as e:
     #     pass
+
+# todo: changelog implementation

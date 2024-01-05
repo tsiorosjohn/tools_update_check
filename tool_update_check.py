@@ -27,7 +27,7 @@ def upd_chk_main_tool_update_check(project_name, local_tool_version_f, online_ch
         repo_url: download URL of latest tool
     """
     UPDATE_CHECK_NEEDED = True  # Set to 'True' if you need periodic checks for tool-updates, or 'False' if you need to disable the update-check
-    UPDATE_CHECK_LAST_CHECK_FILE = "update_last_check.json"
+    UPDATE_CHECK_LAST_CHECK_FILE = "update_last_check.json"  # todo: may need to add current_file_path + os.sep + "update_last_check.json" (= os.path.dirname(os.path.abspath(__file__)))
     UPDATE_CHECK_URL = "https://raw.githubusercontent.com/tsiorosjohn/tools_update_check/master/latest_versions.json"
     UPDATE_CHECK_PROXY_ADDRESS = 'http://10.158.100.2:8080'
     UPDATE_CHECK_DEBUG = True  # todo: 3. change to False for production

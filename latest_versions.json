@@ -27,12 +27,13 @@
     }
   },
   "pcmd_parser": {
-    "latest_version": "0.8.2_beta",
-    "last_update_date": "08.01.2024",
+    "latest_version": "0.9.3_beta",
+    "last_update_date": "21.01.2024",
     "repo_url": "https://gitlabe2.ext.net.nokia.com/CMMtools/pcmd_parser",
     "note": "",
     "comment": "",
     "changelog": {
+      "0.9.3_beta": "21.01.2024:\n        - Added: Decode PCMD values to human-readable format and dump output to HTML file (support for: MME/SGSN/AMF) \n        - Added: Support for CMM23.11 and CMM24.3_dev (i.e. MME: v25 & v26, AMF: v13 & v14) ",
       "0.8.2_beta": "08.01.2024:\n        - Added: Decode PCMD values to human-readable format and dump output to console or to a text file (support for: MME/SGSN/AMF) \n        - Added: Script can be now added to `PATH` in order to be able to be executed from any directory directly! (Thx to Ciprian!) \n        - Added: Script can now decode directly 'console' (`stdin`) text which can be 'piped' to `pcmd_parser.py` (Thx to Ciprian!) ",
       "0.7.1_beta": "27.12.2023 - a) Support for last(X)Pcmd parsing of 'top contributors' depending on 'PCMD version', b) check online for changelog/updates, c) bug fixes",
       "0.5.3_beta": "29.11.2023 - first beta version for internal testing within 3LS"

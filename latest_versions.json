@@ -49,9 +49,7 @@
     "changelog": {
       "2.0.7": "24-04-2024:\n        - added: Support for CNF\n        - added: Support for k8s/infra basic log collection & tcpdump in k8s nodes // work in progress\n        - improved: Remove restriction of need for 'passwordless' sudo users for CMM labs\n        - improved: upgraded to python 3.12\n        - improved: use of multiple threads for faster collection for a) tcpdump, b) files\n        - fixed: many bugs related to newer CMM versions",
       "1.8.0": "19-11-2023: added: Support for automatic check for online updates",
-      "1.7.2": "20-12-2022: added: 'private binary' executable can be also in zipped format",
-      "1.2.0": "120 version major updates & new features added...",
-      "0.9.1_beta": "091 version: test 1"
+      "1.7.2": "20-12-2022: added: 'private binary' executable can be also in zipped format"
     },
     "test": {
       "latest_version": "1.7.2",

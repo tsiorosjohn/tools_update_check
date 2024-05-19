@@ -28,13 +28,13 @@
     }
   },
   "pcmd_parser": {
-    "latest_version": "0.10.2_beta",
-    "last_update_date": "18.05.2024",
+    "latest_version": "0.10.3_beta",
+    "last_update_date": "19.05.2024",
     "repo_url": "https://gitlabe2.ext.net.nokia.com/CMMtools/pcmd_parser",
     "note": "",
     "comment": "",
     "changelog": {
-      "0.10.2_beta": "18.05.2024:\n        - Added: Option for sending anonymous usage statistics for the tool \n        - Improved: Optimizations in speed for last(X)Pcmd execution & in decoding of console output (-d argument) - (Thx to Ciprian!) \n        - Improved: File directory is now allowed to have spaces in case tool is executed with decode options, i.e. '-d', '-df' & 'dh' (decode / decode-file-output / decode-html-output) ",
+      "0.10.3_beta": "19.05.2024:\n        - Added: Option for sending anonymous usage statistics for the tool \n        - Improved: Optimizations in speed for last(X)Pcmd execution & in decoding of console output (-d argument) - (Thx to Ciprian!) \n        - Improved: File directory is now allowed to have spaces in case tool is executed with decode options, i.e. '-d', '-df' & 'dh' (decode / decode-file-output / decode-html-output) \n        - Added: Descriptions & range definitions for more MME primary records",
       "0.9.7_beta": "14.04.2024 - Added: `no-colors` argument in order to disable 'ansi' colors in console. (Useful in case there is need to redirect console output to a text file) ",
       "0.9.6_beta": "28.02.2024 - Added: Auto-rename PCMD files time separator from \":\" to \"_\" (in linux systems) ",
       "0.9.3_beta": "21.01.2024:\n        - Added: Decode PCMD values to human-readable format and dump output to HTML file (support for: MME/SGSN/AMF) \n        - Added: Support for CMM23.11 and CMM24.3_dev (i.e. MME: v25 & v26, AMF: v13 & v14) ",

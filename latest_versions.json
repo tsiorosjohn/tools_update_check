@@ -31,7 +31,7 @@
     "latest_version": "1.0.0",
     "last_update_date": "22.05.2024",
     "repo_url": "https://gitlabe2.ext.net.nokia.com/CMMtools/pcmd_parser",
-    "note": "    Tool can be downloaded either manually from this URL, or you can update any previous existing installation by executing:\n        'python3 update_tool.py' (Linux / WSL2) \n        'python update_tool.py' (Windows) ",
+    "note": "Tool can be downloaded either manually from this URL, or you can update any previous existing installation by executing:\n    'python3 update_tool.py' (Linux / WSL2) \n    'python update_tool.py' (Windows) \n",
     "comment": "",
     "changelog": {
       "1.0.0": "22.05.2024: - Added: 'update_tool.py' script added for automatic update of tool to latest version (by executing: 'python3 update_tool.py')",

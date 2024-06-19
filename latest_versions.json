@@ -19,7 +19,7 @@
     "comment": "",
     "changelog": {
       "1.17.0": "19.06.2024: more counters for olc.mif",
-      "1.16.1": "28.05.2024: 'update_tool.py' script added for automatic update of tool to latest version (by executing: 'python update_tool.py')\n",
+      "1.16.1": "28.05.2024: 'update_tool.py' script added for automatic update of tool to latest version (by executing: 'python update_tool.py')",
       "1.15.1": "11.05.2024:\n        - added: Option for sending anonymous usage statistics for the tool \n        - added: Support for execution of script from any directory (prerequisite: add manually script to 'Windows' `PATH` environmental variable)",
       "1.14.0": "16.01.2024: a) Check for online updates provides full details of new version, b) filter out only perf .gz files needed with '-f' (filter) option",
       "1.13.0": "12.11.2023: Support for automatic check for online updates",

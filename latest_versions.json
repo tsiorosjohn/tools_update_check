@@ -30,12 +30,13 @@
     }
   },
   "pcmd_parser": {
-    "latest_version": "1.0.0",
-    "last_update_date": "22.05.2024",
+    "latest_version": "1.1.0",
+    "last_update_date": "05.10.2024",
     "repo_url": "https://gitlabe2.ext.net.nokia.com/CMMtools/pcmd_parser",
     "note": "Tool can be downloaded either manually from this URL, or you can update any previous existing installation by executing:\n    - 'python3 update_tool.py' (Linux / WSL2) \n    - 'python update_tool.py' (Windows) \n",
     "comment": "",
     "changelog": {
+      "1.1.0": "05.10.2024: - Added: Support for CMM24.7 and CMM24.11_dev (i.e. MME: v27 & v28, AMF: v15 & v16)",
       "1.0.0": "22.05.2024: - Added: 'update_tool.py' script added for automatic update of tool to latest version (by executing: 'python3 update_tool.py')",
       "0.11.0_beta": "21.05.2024:\n        - Improved: decode: support for sorting of AMF/SGSN/MME entries based on date-time, now takes into account also date. \n        - Added: decode: cause codes according to 5GMM Cause 3GPP TS 24.501 9.11.3.2 for AMF 'Procedure Marker Cause Code'",
       "0.10.4_beta": "19.05.2024:\n        - Added: Option for sending anonymous usage statistics for the tool \n        - Improved: Optimizations in speed for last(X)Pcmd execution & in decoding of console output (-d argument) - (Thx to Ciprian!) \n        - Improved: File directory is now allowed to have spaces in case tool is executed with decode options, i.e. '-d', '-df' & 'dh' (decode / decode-file-output / decode-html-output) \n        - Added: Descriptions & range definitions for more MME primary records \n        - Improved: decode: AMF/SGSN/MME display time in both local and UTC times",
